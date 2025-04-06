@@ -1,0 +1,26 @@
+#This is a modified volume script to work with Wireplumber (WPCTL)
+
+#!/bin/bash
+
+output=$(wpctl get-volume @DEFAULT_SINK@)
+
+muted=$(echo "$output" | grep -o 'MUTED')
+volume_decimal=$(echo "$output" | awk '/Volume:/ {print $2}')
+volume_percent=$(echo "$volume_decimal" | awk '{printf "%d", $1 * 100}')
+
+if [ -n "$muted" ]; then
+  echo ~/.config/tint2/executors/icons/audio-volume-muted.svg
+  echo "muted"
+else
+  vol="$volume_percent"
+  if [[ "$vol" -ge 65 ]]; then
+    echo ~/.config/tint2/executors/icons/audio-volume-high.svg
+    echo "$vol%"
+  elif [[ "$vol" -ge 40 ]]; then
+    echo ~/.config/tint2/executors/icons/audio-volume-medium.svg
+    echo "$vol%"
+  elif [[ "$vol" -ge 0 ]]; then
+    echo ~/.config/tint2/executors/icons/audio-volume-low.svg
+    echo "$vol%"
+  fi
+fi
